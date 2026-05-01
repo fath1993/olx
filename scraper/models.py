@@ -13,6 +13,8 @@ class Settings(models.Model):
         verbose_name = 'Settings'
         verbose_name_plural = 'Settings'
 
+    def __str__(self):
+        return f'Settings {self.id}'
 
 class JobLink(models.Model):
     link = models.CharField(max_length=3000, null=False, blank=False, verbose_name='link')
@@ -20,6 +22,9 @@ class JobLink(models.Model):
     class Meta:
         verbose_name = 'Job Link'
         verbose_name_plural = 'Job Links'
+
+    def __str__(self):
+        return f'link {self.id}'
 
 
 class Job(models.Model):
