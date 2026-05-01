@@ -1,8 +1,10 @@
+import threading
+
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from utilities.googlr_translate_api import translate_text, TranslationThread
+from utilities.googlr_translate_api import translate_text
 
 
 class Settings(models.Model):
@@ -65,4 +67,14 @@ def auto_translate_title(sender, instance, created, **kwargs):
     if created:
         TranslationThread(instance).start()
 
+
+class TranslationThread(threading.Thread):
+    def __init__(self, instance):
+        super().__init__()
+        self.instance = instance
+
+    def run(self):
+        translated = translate_text(self.instance.title, get_settings().translated_language)
+        self.instance.title_translation = translated
+        self.instance.save()
 

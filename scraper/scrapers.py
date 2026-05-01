@@ -33,13 +33,18 @@ def ejobs():
 
         job_cards = job_card_list.find_all('li', class_='job-card-wrapper')
 
+        i = 0
         for job_card in job_cards:
             # title
-            title_tag = job_card.find('h2', class_='job-card-content-middle__title')
+            title_tag = job_card.find('h2', class_='job-card-content-middle__title') or job_card.select_one(
+                '.job-card-wrapper__temp strong')
             job_card_title = title_tag.get_text(strip=True) if title_tag else None
+            if not job_card_title:
+                continue
 
             # company
-            company_tag = job_card.find('h3', class_='job-card-content-middle__info--darker')
+            company_tag = job_card.find('h3', class_='job-card-content-middle__info--darker') or job_card.select_one(
+                '.job-card-wrapper__temp strong:nth-of-type(2)')
             job_card_company = company_tag.get_text(strip=True) if company_tag else None
 
             # city
@@ -53,15 +58,9 @@ def ejobs():
             link_tag = job_card.find('a', href=True)
             job_card_link = link_tag['href'] if link_tag else None
 
-            try:
-                Job.objects.get(
-                    source='ejobs',
-                    title=job_card_title,
-                    date=job_card_date,
-                )
-                return print('existed')
-
-            except:
+            if Job.objects.filter(source='ejobs', title=job_card_title, company=job_card_company).exists():
+                print(f'{job_card_title} existed')
+            else:
                 Job.objects.create(
                     source='ejobs',
                     title=job_card_title,
@@ -70,9 +69,7 @@ def ejobs():
                     date=job_card_date,
                     link=job_card_link,
                 )
-                return print('created')
-
-
+                print(f'{job_card_title} created')
 
     except requests.RequestException as e:
         print("Request error:", e)
@@ -108,83 +105,3 @@ def olx():
 
     except requests.RequestException as e:
         print("Request error:", e)
-
-
-def get_openai_response(model, temperature, system_prompt, prompt):
-    attempt = 0
-    while True:
-        try:
-            client = OpenAI(api_key=OPENAI_TOKEN)
-            response = client.chat.completions.create(
-                model=model,
-                temperature=temperature,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt},
-                ],
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            attempt += 1
-            if attempt == AI_SETTING_MAX_RETRIES:
-                print(
-                    f"get_openai_response: Failed after 3 retries' → {str(e)}")
-                return False, e
-            time.sleep(AI_SETTING_RETRY_DELAY)
-
-
-def get_jobs_list(text):
-    system_prompt = """
-    You are a data analyst. You receive raw text (including HTML or webpage content) and analyze it to extract structured and complete information.
-
-    - Extract all relevant items from the text
-    - Do not skip any section
-    - Do not invent missing values
-    - If something is missing, return null
-    - Keep the output clear, structured, and accurate
-    """
-
-    prompt = f'''
-        از متن زیر، تمام آگهی‌های شغلی را بدون هیچ‌گونه فیلتر یا حذف استخراج کن.
-
-        قوانین:
-
-        1. تمام آگهی‌ها را استخراج کن، بدون توجه به اینکه در کدام بخش هستند، از جمله:
-        - نتایج اصلی
-        - نتایج پیشنهادی (arie mai mare de cautare)
-        - هر سکشن دیگر
-
-        2. هیچ آگهی‌ای را حذف نکن (حتی اگر خارج از شهر یا پیشنهادی باشد)،
-        اما فقط مواردی را به عنوان آگهی در نظر بگیر که واقعاً نشان‌دهنده یک موقعیت شغلی مشخص باشند.
-        متن‌های عمومی، تبلیغاتی، دکمه‌ها، لینک‌ها و call-to-action ها (مانند "مشاهده فرصت‌های شغلی"، "تماس بگیرید"، "بدون نیاز به رزومه") را آگهی محسوب نکن.
-
-        3. برای هر آگهی این فیلدها را استخراج کن:
-        - ترجمه فارسی عنوان شغل
-
-        4. ترجمه عنوان شغل باید:
-        - دقیق و طبیعی باشد
-        - تحت‌اللفظی خشک نباشد (مناسب استفاده واقعی)
-        - معنی شغل را درست منتقل کند
-
-        5. اگر فیلدی وجود نداشت، مقدار آن را "نامشخص" قرار بده.
-
-        6. خروجی را به صورت لیست شماره‌گذاری‌شده بده.
-
-        7. در انتها:
-        - تعداد کل آگهی‌ها را اعلام کن
-        - مشخص کن آیا نشانه‌ای از صفحه‌بندی (pagination / صفحه دوم یا بیشتر) در متن وجود دارد یا نه
-        - اگر وجود ندارد، دقیقاً بنویس: "no pagination found in provided text"
-
-        8. قبل از پاسخ، کل متن را دوباره بررسی کن تا مطمئن شوی:
-        - هیچ آگهی واقعی جا نیفتاده است
-        - هیچ متن غیرمرتبط به اشتباه به عنوان آگهی استخراج نشده است
-
-        9. ترجمه فارسی باید مطابق اصطلاحات رایج بازار کار باشد، نه ترجمه لغت‌به‌لغت.
-
-        متن:
-        <<<
-        {text}
-        >>>
-    '''
-
-    return get_openai_response('gpt-5.4', 0.5, system_prompt, prompt)
