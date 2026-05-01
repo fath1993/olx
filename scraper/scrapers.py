@@ -37,7 +37,6 @@ def ejobs():
             # title
             title_tag = job_card.find('h2', class_='job-card-content-middle__title')
             job_card_title = title_tag.get_text(strip=True) if title_tag else None
-            job_card_title_translation =
 
             # company
             company_tag = job_card.find('h3', class_='job-card-content-middle__info--darker')
@@ -60,18 +59,20 @@ def ejobs():
                     title=job_card_title,
                     date=job_card_date,
                 )
+                return print('existed')
+
             except:
                 Job.objects.create(
                     source='ejobs',
                     title=job_card_title,
-                    title_translation=job_card_title_translation,
                     company=job_card_company,
                     city=job_card_city,
                     date=job_card_date,
                     link=job_card_link,
                 )
+                return print('created')
 
-        return response_text
+
 
     except requests.RequestException as e:
         print("Request error:", e)

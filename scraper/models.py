@@ -1,4 +1,8 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from utilities.googlr_translate_api import translate_text, TranslationThread
 
 
 class Settings(models.Model):
@@ -15,6 +19,13 @@ class Settings(models.Model):
 
     def __str__(self):
         return f'Settings {self.id}'
+
+
+def get_settings():
+    if not Settings.objects.exists():
+        return Settings.objects.create(scraper_active=False, translated_language='en')
+    else:
+        return Settings.objects.last()
 
 class JobLink(models.Model):
     link = models.CharField(max_length=3000, null=False, blank=False, verbose_name='link')
@@ -47,4 +58,11 @@ class Job(models.Model):
 
     def __str__(self):
         return f'{self.title_translation}'
+
+
+@receiver(post_save, sender=Job)
+def auto_translate_title(sender, instance, created, **kwargs):
+    if created:
+        TranslationThread(instance).start()
+
 
