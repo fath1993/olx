@@ -2,6 +2,7 @@ import threading
 
 import requests
 
+from custom_logs.models import custom_log
 from olx.settings import GOOGLE_TRANSLATE_TOKEN
 from scraper.models import get_settings
 
@@ -18,18 +19,18 @@ def translate_text(text, target_language):
         response = requests.post(url, data=payload)
 
         if response.status_code == 403:
-            print("limit has been reached")
+            custom_log("limit has been reached")
             return text
 
         if response.status_code == 200:
             result = response.json()
             return result['data']['translations'][0]['translatedText']
         else:
-            print(f"unknown error: {response.status_code}")
+            custom_log(f"unknown error: {response.status_code}")
             return text
 
     except Exception as e:
-        print("server error: ", e)
+        custom_log(f"server error: {e}")
         return text
 
 
