@@ -30,17 +30,6 @@ class JobLinkAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(JobLink)
-class JobLinkAdmin(admin.ModelAdmin):
-    list_display = (
-        'link',
-    )
-
-    fields = (
-        'link',
-    )
-
-
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
     list_display = (

@@ -9,9 +9,17 @@ class Settings(models.Model):
     scraper_active = models.BooleanField(default=False)
     translated_language = models.CharField(max_length=255, choices=LANGUAGES, default='en', null=False, blank=False, verbose_name='translated language')
 
+    class Meta:
+        verbose_name = 'Settings'
+        verbose_name_plural = 'Settings'
+
 
 class JobLink(models.Model):
     link = models.CharField(max_length=3000, null=False, blank=False, verbose_name='link')
+
+    class Meta:
+        verbose_name = 'Job Link'
+        verbose_name_plural = 'Job Links'
 
 
 class Job(models.Model):
@@ -27,4 +35,11 @@ class Job(models.Model):
     date = models.CharField(max_length=1000, null=True, blank=True, verbose_name='date')
     link = models.CharField(max_length=3000, null=True, blank=True, verbose_name='link')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='created at')
+
+    class Meta:
+        verbose_name = 'Job'
+        verbose_name_plural = 'Jobs'
+
+    def __str__(self):
+        return f'{self.title_translation}'
 
