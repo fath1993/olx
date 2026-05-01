@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 
-from apps.custom_logs.models import CustomLog, custom_log
+from custom_logs.models import CustomLog, custom_log
 
 
 @admin.register(CustomLog)

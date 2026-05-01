@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class CustomLogsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = "apps.custom_logs"
+    name = "custom_logs"

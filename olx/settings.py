@@ -7,19 +7,13 @@ environ.Env.read_env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 INSTALLED_APPS = [
-    'admin_interface',
-    'colorfield',
-    'django_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'custom_logs',
-    'scope_manager',
-    'storage',
 ]
 
 MIDDLEWARE = [
@@ -32,7 +26,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'bloomberg.urls'
+ROOT_URLCONF = 'olx.urls'
 
 TEMPLATES = [
     {
@@ -51,7 +45,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'bloomberg.wsgi.application'
+WSGI_APPLICATION = 'olx.wsgi.application'
 
 DATABASES = {}
 
@@ -95,3 +89,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AI_SETTING_MAX_RETRIES = env('AI_SETTING_MAX_RETRIES')
 AI_SETTING_RETRY_DELAY = env('AI_SETTING_RETRY_DELAY')
 OPENAI_TOKEN = env('OPENAI_TOKEN')
+GOOGLE_TRANSLATE_TOKEN = env('GOOGLE_TRANSLATE_TOKEN')
