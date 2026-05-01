@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from openai import OpenAI
 
 from olx.settings import AI_SETTING_MAX_RETRIES, AI_SETTING_RETRY_DELAY, OPENAI_TOKEN
+from scraper.models import Job
 
 
 def ejobs():
@@ -32,17 +33,44 @@ def ejobs():
 
         job_cards = job_card_list.find_all('li', class_='job-card-wrapper')
 
-        response_text = f''''''
-        response_text += 'Ejobs\n'
-        response_text += f'{url}\n'
-        i = 1
-        element = f''''''
         for job_card in job_cards:
-            element += f'{i}- {job_card.text}\n'
-            i += 1
+            # title
+            title_tag = job_card.find('h2', class_='job-card-content-middle__title')
+            job_card_title = title_tag.get_text(strip=True) if title_tag else None
+            job_card_title_translation =
 
-        response_text += str(get_jobs_list(element)).replace('*', '')
-        print(response_text)
+            # company
+            company_tag = job_card.find('h3', class_='job-card-content-middle__info--darker')
+            job_card_company = company_tag.get_text(strip=True) if company_tag else None
+
+            # city
+            city_tag = job_card.find('div', class_='job-card-content-middle__info')
+            job_card_city = city_tag.get_text(strip=True) if city_tag else None
+
+            # date
+            date_tag = job_card.find('div', class_='job-card-content-top__date')
+            job_card_date = date_tag.get_text(strip=True) if date_tag else None
+
+            link_tag = job_card.find('a', href=True)
+            job_card_link = link_tag['href'] if link_tag else None
+
+            try:
+                Job.objects.get(
+                    source='ejobs',
+                    title=job_card_title,
+                    date=job_card_date,
+                )
+            except:
+                Job.objects.create(
+                    source='ejobs',
+                    title=job_card_title,
+                    title_translation=job_card_title_translation,
+                    company=job_card_company,
+                    city=job_card_city,
+                    date=job_card_date,
+                    link=job_card_link,
+                )
+
         return response_text
 
     except requests.RequestException as e:

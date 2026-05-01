@@ -17,6 +17,8 @@ class SettingsAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         if Settings.objects.all().exists():
             return False
+        else:
+            return True
 
 
 @admin.register(JobLink)
