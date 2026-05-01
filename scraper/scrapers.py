@@ -1,10 +1,9 @@
 import time
-from django.utils.timezone import now
 import requests
 from bs4 import BeautifulSoup
 from openai import OpenAI
 
-from erp.settings import AI_SETTING_MAX_RETRIES, AI_SETTING_RETRY_DELAY, OPENAI_TOKEN
+from olx.settings import AI_SETTING_MAX_RETRIES, AI_SETTING_RETRY_DELAY, OPENAI_TOKEN
 
 
 def ejobs():
