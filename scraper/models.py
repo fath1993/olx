@@ -26,4 +26,5 @@ class Job(models.Model):
     city = models.CharField(max_length=1000, null=True, blank=True, verbose_name='city')
     date = models.CharField(max_length=1000, null=True, blank=True, verbose_name='date')
     link = models.CharField(max_length=3000, null=True, blank=True, verbose_name='link')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='created at')
 
